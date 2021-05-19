@@ -106,6 +106,7 @@ class enemy{
     }
 };
 
+//checks for collisons
 int collison(enemy e, car c){
 
     if( ((e.pos.x - c.pos.x) < 2) && ((e.pos.x - c.pos.x) > -2 )){
@@ -148,6 +149,7 @@ void input(vec pos){
     }
 }
 
+//the game
 void play(){
 
     frame console;
@@ -155,6 +157,8 @@ void play(){
     enemy enemies[4];
     bool game = true;
 
+
+    //main loop STATUS:INCOMPLETE
     while(game){
 
         //enemy re-spawner
@@ -165,19 +169,28 @@ void play(){
             }
         }
 
-        player.draw(console);
+        player.draw(console);//add the player to the console
+
         for (int i = 0; i < 5; i++)
         {
             enemies[i].draw(console);
         }
 
-        console.render();
-        for (int i = 0; i < 5; i++)
+        console.render();//draw the current frame
+
+        for (int i = 0; i < 5; i++)//check for collisions
         {
             if(collison(enemies[i],player)){
                 game = false;
             }
-        }    
+        }
+
+        for (int i = 0; i < 5; i++)//shift down the enemies each loop
+        {
+            enemies[i].pos.y++;
+        }
+
+        Sleep(20);//don't want it to run at clock speed obv
     }
 
     cout << "Sorry Noob :)";
