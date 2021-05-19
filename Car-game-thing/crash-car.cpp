@@ -1,31 +1,15 @@
 #include<iostream>
 #include<windows.h>
 #include<conio.h>
+#include<stdlib.h>
 
 /*#include<dos.h>
 #include<time.h>*/
 
 using namespace std;
 
-#define X 1280
-#define Y 720
-
-class frame{
-public:
-    int width = X;
-    int height = Y;
-
-    char display[X][Y];
-
-    void render(){
-        for (int y = 0; y < Y; y++)
-        {
-            for(int x = 0; x < X; x++){
-                cout << display[x][y];
-            }
-        }
-    }
-};
+#define X 100
+#define Y 45
 
 class vec{
     public:
@@ -52,11 +36,8 @@ class vec{
         y = y - b;
     }
 
-    void draw(frame sc){
-        sc.display[x][y] = 'x';
-    }
-
 };
+
 
 class car{
 public:
@@ -64,20 +45,8 @@ public:
     char ch = '+';
 
     car(){
-        pos.x = X/2;
-        pos.y = Y - 3;
-    }
-
-    void draw(frame f){
-        for (int i = -1; i < 2; i++)
-        {
-            f.display[pos.x + i][pos.y] = ch;
-        }
-
-        for (int i = -1; i < 3; i++)
-        {
-            f.display[pos.x][pos.y + i] = ch;
-        }
+        pos.x = 50;
+        pos.y = 40;
     }
 };
 
@@ -86,25 +55,57 @@ class enemy{
     vec pos;
     char ch = 'x';
 
-    void draw(frame f){
-        for (int i = -1; i < 2; i++)
-        {
-            f.display[pos.x + i][pos.y] = ch;
-        }
-
-        for (int i = -1; i < 3; i++)
-        {
-            f.display[pos.x][pos.y + i] = ch;
-        }
-    }
-
     void spawn(){
-        int x = rand()*10/RAND_MAX;
+        int x = rand()*X/RAND_MAX;
 
         pos.y = 1;
         pos.x = x;
     }
 };
+
+
+class frame{
+public:
+    int width = X;
+    int height = Y;
+
+    char display[X][Y];
+
+    void clear(){
+        for (int y = 0; y < Y; y++)
+        {
+            for(int x = 0; x < X; x++){
+                display[x][y] = ' ';
+            }
+        }
+    }
+
+    void addtoconsole(enemy e){
+        display[e.pos.x][e.pos.y] = 'x';
+    }
+
+    void addtoconsole(car c){
+        display[X/2][Y-10] = '+';
+        cout << '+';
+    }
+
+    void render(){
+
+        for (int y = 0; y < Y; y++)
+        {
+            cout << endl;
+
+            for(int x = 0; x < X; x++){
+                cout << display[x][y];
+            }
+
+        }
+    }
+};
+
+
+
+
 
 //checks for collisons
 int collison(enemy e, car c){
@@ -122,25 +123,25 @@ int collison(enemy e, car c){
 }
 
 //handles input
-void input(vec pos){
+void input(car player){
     if(kbhit()){
         char ch;
         switch (ch)
         {
         case 'a':
-            pos.x--;
+            if(player.pos.x > 0){player.pos.x--;}
             break;
-        
+
         case 'd':
-            pos.x++;
+            if(player.pos.x < X){player.pos.x++;}
             break;
 
         case 'w':
-            pos.y--;
+            if(player.pos.y > 0){player.pos.y--;}
             break;
 
         case 's':
-            pos.y++;
+            if(player.pos.y < Y){player.pos.y++;}
             break;
 
         default:
@@ -151,15 +152,21 @@ void input(vec pos){
 
 //the game
 void play(){
-
     frame console;
     car player;
     enemy enemies[4];
+    for (int i = 0; i < 5; i++)
+        {
+            enemies[i].spawn();
+        }
     bool game = true;
 
+    cout << "HERE BEFORE MAIN";
 
     //main loop STATUS:INCOMPLETE
     while(game){
+        cout << "FUCK";
+        console.clear();//clear the last frame (data)
 
         //enemy re-spawner
         for (int i = 0; i < 5; i++)
@@ -169,28 +176,38 @@ void play(){
             }
         }
 
-        player.draw(console);//add the player to the console
+        console.addtoconsole(player);
+        
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)//add the enemies to the console
         {
-            enemies[i].draw(console);
+            console.addtoconsole(enemies[i]);
         }
 
         console.render();//draw the current frame
 
-        for (int i = 0; i < 5; i++)//check for collisions
+        cout << "HERE BEFORE INPUT";
+
+        input(player);//the input from the player
+
+        cout << "HERE BEFORE CLS";
+        system("CLS");
+        Sleep(100);//don't want it to run at clock speed obv
+
+
+        /*for (int i = 0; i < 5; i++)//check for collisions
         {
             if(collison(enemies[i],player)){
-                game = false;
+                //game = false;
             }
-        }
+        }*/
 
         for (int i = 0; i < 5; i++)//shift down the enemies each loop
         {
             enemies[i].pos.y++;
         }
 
-        Sleep(20);//don't want it to run at clock speed obv
+
     }
 
     cout << "Sorry Noob :)";
@@ -198,6 +215,7 @@ void play(){
 
 int main(){
 
+play();
 
 return 0;
 }
